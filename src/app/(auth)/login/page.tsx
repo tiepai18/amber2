@@ -1,43 +1,53 @@
-import { Metadata } from 'next'
 import { LoginForm } from '@/components/auth/LoginForm'
+import { type Metadata } from 'next'
+
+// This is a Server Component, so we import the LoginForm here.
+// import { LoginForm } from '@/components/auth/LoginForm'; // Assuming this is the correct path
 
 export const metadata: Metadata = {
-  title: 'Sign In',
-  description: 'Sign in to your account',
+  title: 'Sign In | The Crochet Corner',
+  description: 'Access your account at The Crochet Corner.',
 }
 
 export default function LoginPage() {
   return (
-    <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
-        <div className="absolute inset-0 bg-zinc-900" />
-        <div className="relative z-20 flex items-center text-lg font-medium">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-2 h-6 w-6"
-          >
-            <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-          </svg>
-          Crochet Store
+    <div
+      className="relative min-h-screen w-full flex items-center justify-center p-4"
+      style={{ backgroundColor: '#FEF6E4' /* A warm, pastel background */ }}
+    >
+      {/* Decorative background blobs */}
+      <div className="absolute top-10 left-10 w-24 h-24 bg-[#FBDBB7]/50 rounded-full blur-xl animate-pulse"></div>
+      <div className="absolute bottom-10 right-10 w-32 h-32 bg-[#C5B5B0]/40 rounded-full blur-xl animate-pulse delay-500"></div>
+
+      {/* Main Container */}
+      <div className="container grid lg:grid-cols-2 lg:max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden border-4 border-white w-full">
+        {/* Left side with image and quote */}
+        <div className="relative hidden h-full lg:flex">
+          <img
+            src="https://images.unsplash.com/photo-1621409529035-385a1515a25f?q=80&w=1887&auto=format&fit=crop"
+            alt="Handmade crochet items"
+            className="object-cover w-full h-full"
+            // onError={(e) => e.currentTarget.src = 'https://placehold.co/600x800/C5B5B0/62220C?text=Crochet+Love'}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#62220C]/30 to-transparent"></div>
+          <div className="absolute bottom-8 left-8 right-8 z-20">
+            <blockquote className="space-y-2 bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg">
+              <p className="text-lg font-medium text-[#62220C]">
+                &quot;Each stitch tells a story, each piece a work of
+                heart.&quot;
+              </p>
+              <footer className="text-sm text-[#62220C]/70">
+                - The Crochet Corner
+              </footer>
+            </blockquote>
+          </div>
         </div>
-        <div className="relative z-20 mt-auto">
-          <blockquote className="space-y-2">
-            <p className="text-lg">
-              &quot;Beautiful handmade crochet items and patterns for crafters
-              worldwide.&quot;
-            </p>
-          </blockquote>
-        </div>
-      </div>
-      <div className="lg:p-8">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-          <LoginForm />
+
+        {/* Right side with the login form */}
+        <div className="flex items-center justify-center p-6 md:p-8 lg:p-12 overflow-y-auto">
+          <div className="mx-auto flex w-full flex-col justify-center sm:w-[400px]">
+            <LoginForm />
+          </div>
         </div>
       </div>
     </div>

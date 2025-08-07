@@ -11,6 +11,8 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
+  const userRole = session?.user?.app_metadata?.role ?? 'customer'
+
   // Protected routes
   const protectedRoutes = ['/profile', '/orders', '/admin']
   const adminRoutes = ['/admin']
@@ -30,16 +32,8 @@ export async function middleware(req: NextRequest) {
   }
 
   // Check admin permissions
-  if (isAdminRoute && session) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', session.user.id)
-      .single()
-
-    if (profile?.role !== 'admin') {
-      return NextResponse.redirect(new URL('/unauthorized', req.url))
-    }
+  if (isAdminRoute && userRole !== 'admin') {
+    return NextResponse.redirect(new URL('/unauthorized', req.url))
   }
 
   // Redirect authenticated users away from auth pages
