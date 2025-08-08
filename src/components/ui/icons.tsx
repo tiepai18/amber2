@@ -15,11 +15,13 @@ import {
   CheckCircle,
   Mail,
   Loader2, // Thường dùng cho spinner
+  Book,
+  Calendar,
 } from 'lucide-react'
 
-// export type Icon = LucideIcon
-
 export const Icons = {
+  calendar: Calendar,
+  book: Book,
   sun: SunMedium,
   moon: Moon,
   laptop: Laptop,

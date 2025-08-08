@@ -37,8 +37,8 @@ export const resetPasswordSchema = z
 export const updateProfileSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
   phone: z.string().optional(),
-  dateOfBirth: z.string().optional(),
-  gender: z.enum(['male', 'female', 'other', '']).optional(),
+  dateOfBirth: z.date().optional(),
+  gender: z.enum(['male', 'female', 'other', 'none']).optional(),
 })
 
 export type LoginInput = z.infer<typeof loginSchema>

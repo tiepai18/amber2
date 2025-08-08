@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 
-function RegisterImage() {
+function LoginImage() {
   return (
     <div className="relative hidden h-full lg:flex">
       <Image
@@ -17,12 +17,11 @@ function RegisterImage() {
         priority
         className="object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#62220C]/40 to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-[#62220C]/30 to-transparent"></div>
       <div className="absolute bottom-8 left-8 right-8 z-20">
         <blockquote className="space-y-2 bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg">
           <p className="text-lg font-medium text-[#62220C]">
-            &quot;Creativity is contagious, pass it on. Join our family of
-            makers and dreamers.&quot;
+            &quot;Each stitch tells a story, each piece a work of heart.&quot;
           </p>
           <footer className="text-sm text-[#62220C]/70">
             - The Crochet Corner
@@ -33,4 +32,4 @@ function RegisterImage() {
   )
 }
 
-export default RegisterImage
+export default LoginImage
