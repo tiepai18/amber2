@@ -1,7 +1,7 @@
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button' // Đã import ở trên
-import Link from 'next/link' // Đã import ở trên
-import Image from 'next/image' // Đã import ở trên
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import Image from 'next/image'
 
 export function Footer() {
   return (
@@ -12,7 +12,7 @@ export function Footer() {
           <div className="md:col-span-1">
             <Link href="/" className="mb-4 inline-block">
               <Image
-                src="/images/logo.svg"
+                src="/images/logo.webp"
                 alt="The Crochet Corner Logo"
                 width={50}
                 height={50}

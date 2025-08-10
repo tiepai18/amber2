@@ -76,6 +76,7 @@ function FeaturedProducts() {
                   alt={product.name}
                   width={400}
                   height={400}
+                  unoptimized
                   className="group-hover:scale-105 transition-transform duration-300"
                 />
               </div>

@@ -1,21 +1,18 @@
 // next.config.js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
   images: {
-    domains: [
-      'supabase.co',
-      'your-project.supabase.co',
-      'images.unsplash.com',
-      'res.cloudinary.com',
-    ],
     formats: ['image/webp', 'image/avif'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'placehold.co',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'xrkswzfirbiyelhyoxfi.supabase.co',
         port: '',
         pathname: '/**',
       },
