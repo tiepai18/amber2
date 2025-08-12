@@ -14,8 +14,8 @@ export function Footer() {
               <Image
                 src="/images/logo.webp"
                 alt="The Crochet Corner Logo"
-                width={50}
-                height={50}
+                width={140}
+                height={60}
               />
             </Link>
             <p className="text-sm text-[#62220C]/80">

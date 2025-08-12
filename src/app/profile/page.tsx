@@ -5,17 +5,17 @@ import { ProfileSidebar } from '@/components/auth/ProfileSidebar'
 import { ProfileForm } from '@/components/auth/ProfileForm'
 
 export const metadata: Metadata = {
-  title: 'My Profile | The Crochet Corner',
+  title: 'My Profile | Ambertinybear',
   description: 'Manage your account settings and personal information.',
 }
 
 export default async function ProfilePage() {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session) {
+  if (!user) {
     redirect('/login?redirectTo=/profile')
   }
 

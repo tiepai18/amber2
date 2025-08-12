@@ -34,9 +34,9 @@ export function ResetPasswordForm() {
     // Check if we have a valid session for password reset
     const checkSession = async () => {
       const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      if (session) {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (user) {
         setIsValidSession(true)
       } else {
         router.push('/login')

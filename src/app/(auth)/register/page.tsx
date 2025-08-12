@@ -7,8 +7,8 @@ import { type Metadata } from 'next'
 // import { RegisterImage } from '@/components/auth/RegisterImage';
 
 export const metadata: Metadata = {
-  title: 'Create Account | The Crochet Corner',
-  description: 'Join our community of crafters at The Crochet Corner.',
+  title: 'Create Account | Ambertinybear',
+  description: 'Join our community of crafters at Ambertinybear.',
 }
 
 export default function RegisterPage() {

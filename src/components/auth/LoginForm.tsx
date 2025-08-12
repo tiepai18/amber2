@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -19,7 +19,16 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirectTo') || '/profile'
+
+  // Validate redirect URL to prevent open redirect vulnerability
+  const redirectParam = searchParams.get('redirectTo')
+  const redirectTo =
+    redirectParam &&
+    redirectParam.startsWith('/') &&
+    !redirectParam.startsWith('//')
+      ? redirectParam
+      : '/profile'
+
   const supabase = createClient()
 
   const {
@@ -30,33 +39,58 @@ export function LoginForm() {
     resolver: zodResolver(loginSchema),
   })
 
-  const onSubmit = async (data: LoginInput) => {
-    setIsLoading(true)
-    setError(null)
-
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    })
-
-    if (signInError) {
-      setError(signInError.message)
+  useEffect(() => {
+    return () => {
       setIsLoading(false)
-      return
+      setError(null)
     }
+  }, [])
 
-    // This will refresh the page and the middleware will handle the redirect.
-    router.refresh()
+  const onSubmit = async (data: LoginInput) => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      })
+
+      if (signInError) {
+        setError(signInError.message)
+        setIsLoading(false)
+        return
+      }
+
+      router.refresh()
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.')
+      setIsLoading(false)
+    }
   }
 
   const signInWithGoogle = async () => {
-    setIsLoading(true)
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?redirectTo=${redirectTo}`,
-      },
-    })
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`,
+        },
+      })
+
+      if (error) {
+        setError(error.message)
+        setIsLoading(false)
+      }
+      // Note: If successful, the user will be redirected to Google OAuth flow
+      // The loading state will be reset when they return or the component unmounts
+    } catch (err) {
+      setError('Failed to sign in with Google. Please try again.')
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -86,7 +120,7 @@ export function LoginForm() {
       {error && (
         <Alert
           variant="destructive"
-          className="border-red-200 bg-red-50/80 backdrop-blur-sm"
+          className="border-red-200 bg-red-50/80 backdrop-blur-sm relative z-10"
         >
           <AlertDescription className="text-red-700">{error}</AlertDescription>
         </Alert>
@@ -109,6 +143,7 @@ export function LoginForm() {
               {...register('email')}
               disabled={isLoading}
               className="pl-10 h-11 w-full bg-white/60 border-[#FBDBB7] focus:border-[#C5B5B0] focus:ring-[#C5B5B0]/20 rounded-xl transition-all duration-200 hover:bg-white/80"
+              autoComplete="email"
             />
             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#62220C]/40">
               📧
@@ -137,6 +172,7 @@ export function LoginForm() {
               {...register('password')}
               disabled={isLoading}
               className="pl-10 h-11 w-full bg-white/60 border-[#FBDBB7] focus:border-[#C5B5B0] focus:ring-[#C5B5B0]/20 rounded-xl transition-all duration-200 hover:bg-white/80"
+              autoComplete="current-password"
             />
             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#62220C]/40">
               🔒
@@ -187,7 +223,7 @@ export function LoginForm() {
         type="button"
         disabled={isLoading}
         onClick={signInWithGoogle}
-        className="w-full h-11 flex items-center justify-center gap-2 border-[#FBDBB7] hover:bg-[#FBDBB7]/20 rounded-xl transition-all duration-200 hover:shadow-md"
+        className="w-full h-11 flex items-center justify-center gap-2 border-[#FBDBB7] hover:bg-[#FBDBB7]/20 rounded-xl transition-all duration-200 hover:shadow-md relative z-10"
       >
         {isLoading ? (
           <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />

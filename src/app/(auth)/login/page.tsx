@@ -3,8 +3,8 @@ import LoginImage from '@/components/auth/LoginImage'
 import { type Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Sign In | The Crochet Corner',
-  description: 'Access your account at The Crochet Corner.',
+  title: 'Sign In | Ambertinybear',
+  description: 'Access your account at Ambertinybear.',
 }
 
 export default function LoginPage() {

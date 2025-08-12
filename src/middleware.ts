@@ -1,49 +1,68 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import type { Database } from '@/types/supabase'
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient<Database>({ req, res })
+export async function middleware(request: NextRequest) {
+  const response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value) // Update request cookies for the current chain
+            response.cookies.set(name, value, options) // Set cookies on the response to send to the browser
+          })
+        },
+      },
+    }
+  )
 
   const {
     data: { session },
   } = await supabase.auth.getSession()
 
   const userRole = session?.user?.app_metadata?.role ?? 'customer'
+  const { pathname } = request.nextUrl
 
-  // Protected routes
   const protectedRoutes = ['/profile', '/orders', '/admin']
   const adminRoutes = ['/admin']
+  const authRoutes = ['/login', '/register']
 
   const isProtectedRoute = protectedRoutes.some((route) =>
-    req.nextUrl.pathname.startsWith(route)
+    pathname.startsWith(route)
   )
-  const isAdminRoute = adminRoutes.some((route) =>
-    req.nextUrl.pathname.startsWith(route)
-  )
+  const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route))
+  const isAuthRoute = authRoutes.includes(pathname)
 
-  // Redirect to login if accessing protected route without session
-  if (isProtectedRoute && !session) {
-    const redirectUrl = new URL('/login', req.url)
-    redirectUrl.searchParams.set('redirectTo', req.nextUrl.pathname)
+  if (!session && isProtectedRoute) {
+    const redirectUrl = request.nextUrl.clone()
+    redirectUrl.pathname = '/login'
+    redirectUrl.searchParams.set('redirectTo', pathname)
     return NextResponse.redirect(redirectUrl)
   }
 
-  // Check admin permissions
-  if (isAdminRoute && userRole !== 'admin') {
-    return NextResponse.redirect(new URL('/unauthorized', req.url))
+  if (session && isAuthRoute) {
+    return NextResponse.redirect(new URL('/profile', request.url))
   }
 
-  // Redirect authenticated users away from auth pages
-  if (session && ['/login', '/register'].includes(req.nextUrl.pathname)) {
-    return NextResponse.redirect(new URL('/profile', req.url))
+  if (session && isAdminRoute && userRole !== 'admin') {
+    return NextResponse.redirect(new URL('/unauthorized', request.url))
   }
 
-  return res
+  return response
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }

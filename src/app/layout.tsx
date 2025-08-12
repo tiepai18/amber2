@@ -3,6 +3,13 @@ import { AuthProvider } from '@/lib/hooks/useAuth'
 import './globals.css'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Ambertinybear | Handmade with Love',
+  description:
+    'Discover unique crochet creations, patterns, and kits. Handmade happiness, stitched with love.',
+}
 
 const inter = Inter({ subsets: ['latin'] })
 

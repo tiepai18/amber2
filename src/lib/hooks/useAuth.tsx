@@ -23,8 +23,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
+  // This function can be called from other components to manually refresh the profile
   const refreshProfile = async () => {
-    if (!user) return
+    // It's safer to get the user again to ensure the session is still valid
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) {
+      setProfile(null)
+      return
+    }
 
     const { data: profileData } = await supabase
       .from('profiles')
@@ -32,47 +40,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .eq('id', user.id)
       .single()
 
-    if (profileData) {
-      setProfile(profileData)
-    }
+    setProfile(profileData)
   }
 
   useEffect(() => {
-    const getInitialSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
-
-      if (session?.user) {
-        await refreshProfile()
-      }
-      setLoading(false)
-    }
-
-    getInitialSession()
-
+    // onAuthStateChange automatically runs on initialization with the current session
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setUser(session?.user ?? null)
+      const currentUser = session?.user ?? null
+      setUser(currentUser)
 
-      if (session?.user) {
-        await refreshProfile()
+      // If there's a user, fetch their profile
+      if (currentUser) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', currentUser.id)
+          .single()
+        setProfile(profileData)
       } else {
+        // If the user signs out, clear the profile
         setProfile(null)
       }
+
       setLoading(false)
     })
 
-    return () => subscription.unsubscribe()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id])
+    // Unsubscribe from the listener when the component unmounts
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [supabase]) // This effect should only run once
 
   const signOut = async () => {
     await supabase.auth.signOut()
-    setUser(null)
-    setProfile(null)
+    // No need to manually set user/profile to null,
+    // onAuthStateChange will handle it automatically.
   }
 
   const value = {
@@ -83,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshProfile,
   }
 
-  return <AuthContext value={value}>{children}</AuthContext>
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export const useAuth = () => {

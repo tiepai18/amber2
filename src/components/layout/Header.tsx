@@ -23,12 +23,12 @@ export function Header() {
           <Image
             src="/images/logo.webp"
             alt="The Crochet Corner Logo"
-            width={40}
+            width={140}
             height={40}
           />
-          <span className="hidden text-xl font-bold text-[#62220C] sm:inline-block">
+          {/* <span className="hidden text-xl font-bold text-[#62220C] sm:inline-block">
             The Crochet Corner
-          </span>
+          </span> */}
         </Link>
 
         {/* Desktop Navigation */}

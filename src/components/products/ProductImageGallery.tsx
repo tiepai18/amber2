@@ -13,10 +13,12 @@ export function ProductImageGallery({
   images,
   productName,
 }: ProductImageGalleryProps) {
-  const [selectedImage, setSelectedImage] = useState(images[0])
+  // Thay đổi state để theo dõi chỉ số (index) của ảnh được chọn
+  const [selectedIndex, setSelectedIndex] = useState(0)
 
+  // Khi prop `images` thay đổi, reset lại ảnh được chọn về ảnh đầu tiên
   useEffect(() => {
-    setSelectedImage(images[0])
+    setSelectedIndex(0)
   }, [images])
 
   return (
@@ -26,10 +28,12 @@ export function ProductImageGallery({
         {images.map((image, index) => (
           <button
             key={index}
-            onClick={() => setSelectedImage(image)}
+            // Cập nhật onClick để set chỉ số (index)
+            onClick={() => setSelectedIndex(index)}
             className={cn(
               'aspect-square relative w-full overflow-hidden rounded-lg border-2 transition-all duration-300 ease-in-out transform hover:scale-105',
-              selectedImage === image
+              // So sánh bằng chỉ số
+              selectedIndex === index
                 ? 'border-[#62220C]'
                 : 'border-transparent hover:border-[#C5B5B0]'
             )}
@@ -45,7 +49,7 @@ export function ProductImageGallery({
         ))}
       </div>
 
-      {/* Main Image Display with Cross-fade Effect */}
+      {/* Main Image Display with Horizontal Carousel Effect */}
       <div className="lg:col-span-4 order-1 lg:order-2 aspect-square relative w-full overflow-hidden rounded-2xl border-2 border-[#FBDBB7]/50">
         {images.map((image, index) => (
           <Image
@@ -55,8 +59,16 @@ export function ProductImageGallery({
             fill
             sizes="(max-width: 1023px) 100vw, 80vw"
             className={cn(
-              'object-cover transition-opacity duration-500 ease-in-out',
-              selectedImage === image ? 'opacity-100' : 'opacity-0'
+              'object-cover absolute inset-0 transition-transform duration-500 ease-in-out',
+              // Logic trượt ngang:
+              // - Ảnh được chọn: ở vị trí trung tâm (translate-x-0)
+              // - Ảnh đã qua: trượt sang trái (-translate-x-full)
+              // - Ảnh sắp tới: chờ ở bên phải (translate-x-full)
+              index === selectedIndex
+                ? 'translate-x-0'
+                : index < selectedIndex
+                  ? '-translate-x-full'
+                  : 'translate-x-full'
             )}
           />
         ))}
