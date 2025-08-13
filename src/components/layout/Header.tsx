@@ -3,9 +3,10 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Search, Heart, ShoppingBag, Menu } from 'lucide-react'
-import { UserMenu } from '@/components/auth/UserMenu' // Giả sử bạn đã có component này
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet' // Dùng cho menu mobile
+import { UserMenu } from '@/components/auth/UserMenu'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
+import { useCartStore } from '@/lib/store/cart'
 
 const navLinks = [
   { href: '/shop', label: 'Shop' },
@@ -15,6 +16,10 @@ const navLinks = [
 ]
 
 export function Header() {
+  // Get state and actions from the cart store
+  const { items, toggleCart } = useCartStore()
+  const totalItems = items.reduce((acc, item) => acc + item.quantity, 0)
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#FBDBB7]/50 bg-white/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 md:px-6">
@@ -22,13 +27,10 @@ export function Header() {
         <Link href="/" className="flex items-center gap-2">
           <Image
             src="/images/logo.webp"
-            alt="The Crochet Corner Logo"
+            alt="Ambertinybear Logo"
             width={140}
             height={40}
           />
-          {/* <span className="hidden text-xl font-bold text-[#62220C] sm:inline-block">
-            The Crochet Corner
-          </span> */}
         </Link>
 
         {/* Desktop Navigation */}
@@ -52,6 +54,7 @@ export function Header() {
             className="hidden md:inline-flex text-[#62220C]/80 hover:text-[#62220C]"
           >
             <Search className="h-5 w-5" />
+            <span className="sr-only">Search</span>
           </Button>
           <Link href="/wishlist">
             <Button
@@ -60,17 +63,25 @@ export function Header() {
               className="hidden md:inline-flex text-[#62220C]/80 hover:text-[#62220C]"
             >
               <Heart className="h-5 w-5" />
+              <span className="sr-only">Wishlist</span>
             </Button>
           </Link>
-          <Link href="/cart">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-[#62220C]/80 hover:text-[#62220C]"
-            >
-              <ShoppingBag className="h-5 w-5" />
-            </Button>
-          </Link>
+
+          {/* Shopping Cart Button */}
+          <Button
+            onClick={toggleCart}
+            variant="ghost"
+            size="icon"
+            className="relative text-[#62220C]/80 hover:text-[#62220C]"
+          >
+            <ShoppingBag className="h-5 w-5" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                {totalItems}
+              </span>
+            )}
+            <span className="sr-only">Open cart</span>
+          </Button>
 
           <div className="hidden md:block">
             <UserMenu />
@@ -82,6 +93,7 @@ export function Header() {
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
                   <Menu className="h-6 w-6 text-[#62220C]" />
+                  <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[400px]">

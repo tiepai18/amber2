@@ -4,6 +4,7 @@ import './globals.css'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { Metadata } from 'next'
+import { CartSidebar } from '@/components/cart/CartSidebar'
 
 export const metadata: Metadata = {
   title: 'Ambertinybear | Handmade with Love',
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-white text-[#62220C]`}>
         <AuthProvider>
           <Header />
+          <CartSidebar />
           {children}
           <Footer />
         </AuthProvider>
