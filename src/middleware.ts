@@ -27,10 +27,10 @@ export async function middleware(request: NextRequest) {
   )
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  const userRole = session?.user?.app_metadata?.role ?? 'customer'
+  const userRole = user?.app_metadata?.role ?? 'customer'
   const { pathname } = request.nextUrl
 
   const protectedRoutes = ['/profile', '/orders', '/admin']
@@ -43,18 +43,18 @@ export async function middleware(request: NextRequest) {
   const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route))
   const isAuthRoute = authRoutes.includes(pathname)
 
-  if (!session && isProtectedRoute) {
+  if (!user && isProtectedRoute) {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/login'
     redirectUrl.searchParams.set('redirectTo', pathname)
     return NextResponse.redirect(redirectUrl)
   }
 
-  if (session && isAuthRoute) {
+  if (user && isAuthRoute) {
     return NextResponse.redirect(new URL('/profile', request.url))
   }
 
-  if (session && isAdminRoute && userRole !== 'admin') {
+  if (user && isAdminRoute && userRole !== 'admin') {
     return NextResponse.redirect(new URL('/unauthorized', request.url))
   }
 
